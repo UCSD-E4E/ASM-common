@@ -2,14 +2,32 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 
+class AudioStream(ABC):
+    @abstractmethod
+    def configure_audio(self, *,
+                        rate:int = None,
+                        codec:str = None,
+                        bitrate:int = None,
+                        num_channels: int = None) -> None:
+        pass
+    
+class VideoStream(ABC):
+    @abstractmethod
+    def configure_video(self, *,
+                        rate:int = None,
+                        codec:str = None,
+                        bitrate:int = None,
+                        ) -> None:
+        pass
+
 class MediaInput(ABC):
     @abstractmethod
-    def create_ffmpeg_opts(self) -> List[str]:
+    def create_ffmpeg_source_opts(self) -> List[str]:
         pass
 
 class MediaOutput(ABC):
     @abstractmethod
-    def create_ffmpeg_opts(self) -> List[str]:
+    def create_ffmpeg_sink_opts(self) -> List[str]:
         pass
 
 class FFMPEGInstance:
@@ -22,12 +40,18 @@ class FFMPEGInstance:
         opts = []
         if self.__input is None:
             raise RuntimeError("No input configuration")
-        opts.extend(self.__input.create_ffmpeg_opts())
+        opts.extend(self.__input.create_ffmpeg_source_opts())
         if self.__time is not None:
             opts.extend(['-t', f'{self.__time}'])
         if self.__output is None:
             raise RuntimeError("No output configuration")
-        opts.extend(self.__output.create_ffmpeg_opts())
+        
+        if isinstance(self.__output, VideoStream) and not isinstance(self.__input, VideoStream):
+            raise RuntimeError("No video source!")
+        if isinstance(self.__output, AudioStream) and not isinstance(self.__input, AudioStream):
+            raise RuntimeError("No audio source!")
+        
+        opts.extend(self.__output.create_ffmpeg_sink_opts())
         return opts
 
     def get_command(self) -> List[str]:

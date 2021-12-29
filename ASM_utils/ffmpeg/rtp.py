@@ -15,13 +15,16 @@ class RTPStream(MediaOutput, MediaInput):
     def configure_audio(self, *,
                         rate:int = None,
                         codec:str = None,
-                        bitrate:int = None):
+                        bitrate:int = None,
+                        num_channels: int = None):
         if rate is not None:
             self.__audio_flags['ar'] = f'{rate}'
         if codec is not None:
-            self.__audio_flags['acodec'] = codec
+            self.__audio_flags['codec:a'] = codec
         if bitrate is not None:
             self.__audio_flags['b:a'] = f'{bitrate}'
+        if num_channels is not None:
+            self.__audio_flags['ac'] = f'{num_channels}'
     
     def configure_video(self, *,
                         rate:int = None,
@@ -29,13 +32,13 @@ class RTPStream(MediaOutput, MediaInput):
                         bitrate:int = None,
                         ):
         if rate is not None:
-            self.__video_flags['r'] = f'{rate}'
+            self.__video_flags['r:v'] = f'{rate}'
         if codec is not None:
-            self.__video_flags['vcodec'] = codec
+            self.__video_flags['codec:v'] = codec
         if bitrate is not None:
             self.__video_flags['b:v'] = f'{bitrate}'
 
-    def create_ffmpeg_opts(self) -> List[str]:
+    def create_ffmpeg_sink_opts(self) -> List[str]:
         opts = []
         for key, value in self.__audio_flags.items():
             opts.append('-' + key)
@@ -46,6 +49,20 @@ class RTPStream(MediaOutput, MediaInput):
         if self.__port is None:
             raise RuntimeError("Port not set")
         opts.append(f'{self.__protocol}://{self.__hostname}:{self.__port}')
+        return opts
+    
+    def create_ffmpeg_source_opts(self) -> List[str]:
+        opts = []
+        for key, value in self.__audio_flags.items():
+            opts.append('-' + key)
+            opts.append(value)
+        for key, value in self.__video_flags.items():
+            opts.append('-' + key)
+            opts.append(value)
+        if self.__port is None:
+            raise RuntimeError("Port not set")
+        opts.append('-i')
+        opts.append(f'{self.__protocol}://{self.__hostname}:{self.__port}?listen')
         return opts
 
     def set_port(self, port:int) -> None:
