@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Project specific ignores
-test_artififacts/
+test_artifacts/

@@ -15,18 +15,19 @@ def test_audioHWSource():
     port = 8500
     num_channels = 1
 
-    test_file_path = pathlib.Path('test_artififacts', 'test.mp3')
+    test_file_path = pathlib.Path('test_artifacts', 'test.mp3')
     if test_file_path.exists():
         test_file_path.unlink()
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    server_params = ['ffmpeg', '-i', f'tcp://@:{port}?listen', '-acodec', 'copy', '-flags',
+    server_params = ['ffmpeg', '-i', f'tcp://127.0.0.1:{port}?listen', '-acodec', 'copy', '-flags',
          '+global_header', '-reset_timestamps', '1', test_file_path.as_posix()]
      
     rx_ffmpeg = subprocess.Popen(server_params)
+    assert(rx_ffmpeg.poll() is None)
     
     audio_source = audio.HWAudioSource('default', num_channels=num_channels)
-    audio_sink = rtp.RTPOutputStream('127.0.0.1', port)
+    audio_sink = rtp.RTPStream('127.0.0.1', port)
     audio_sink.configure_audio(codec='libmp3lame', rate=sample_rate)
     ffmpeg_config = ffmpeg.FFMPEGInstance(
         input_obj=audio_source, output_obj=audio_sink)
