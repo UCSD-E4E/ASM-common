@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
+
 class MediaInput(ABC):
     @abstractmethod
     def create_ffmpeg_opts(self) -> List[str]:
