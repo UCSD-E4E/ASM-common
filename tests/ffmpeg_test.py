@@ -1,4 +1,5 @@
 import datetime as dt
+import glob
 import json
 import os
 import pathlib
@@ -6,9 +7,9 @@ import subprocess
 
 import ASM_utils.ffmpeg.audio as audio
 import ASM_utils.ffmpeg.ffmpeg as ffmpeg
-from ASM_utils.ffmpeg.file import AudioFileSink, SegmentedAudioFileSink
 import ASM_utils.ffmpeg.rtp as rtp
 import ASM_utils.ffmpeg.video as video
+from ASM_utils.ffmpeg.file import AudioFileSink, SegmentedAudioFileSink
 
 
 def test_audioHWSource():
@@ -17,7 +18,7 @@ def test_audioHWSource():
     port = 8500
     num_channels = 1
 
-    test_file_path = pathlib.Path('test_artifacts', 'test.mp3')
+    test_file_path = pathlib.Path('test_artifacts', 'test_audioHWSource.mp3')
     if test_file_path.exists():
         test_file_path.unlink()
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -54,7 +55,7 @@ def test_audioServer():
     num_channels = 1
     ip_addr = '127.0.0.1'
 
-    test_file_path = pathlib.Path('test_artifacts', 'test.mp3')
+    test_file_path = pathlib.Path('test_artifacts', 'test_audioServer.mp3')
     if test_file_path.exists():
         test_file_path.unlink()
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -77,14 +78,16 @@ def test_audioServer():
     assert(rx_ffmpeg.wait(test_time) == 0)
 
 def test_segment_output():
-    test_time = 15
+    test_time = 12
     num_channels = 1
     sample_rate = 48000
-    test_file_path = pathlib.Path('test_artifacts', 'test_segment_output_%Y.%m.%d.%H.%M.%S.mp3')
+    test_data_dir = pathlib.Path('test_artifacts')
+    test_data_dir.mkdir(parents=True, exist_ok=True)
 
-    if test_file_path.exists():
-        test_file_path.unlink()
-    test_file_path.parent.mkdir(parents=True, exist_ok=True)
+    test_file_path = test_data_dir.joinpath('test_segment_output_%Y.%m.%d.%H.%M.%S.mp3')
+    
+    for test_file in test_data_dir.glob('test_segment_output_*.mp3'):
+        test_file.unlink()
 
     audio_source = audio.HWAudioSource('default', num_channels=num_channels)
     stream_sink = SegmentedAudioFileSink(path=test_file_path, segment_length=dt.timedelta(seconds=5))
@@ -94,3 +97,5 @@ def test_segment_output():
      
     ffmpeg_cmd = ffmpeg_config.get_command()
     subprocess.check_call(ffmpeg_cmd)
+    generated_files = list(test_data_dir.glob('test_segment_output_*.mp3'))
+    assert(len(generated_files) == 3)
