@@ -3,9 +3,9 @@ import os
 import ASM_utils
 
 setup(
-    name='SensorNode',
+    name='AsmCommon',
     version=ASM_utils.__version__,
-    description='Sensor Node',
+    description='Aye-Aye Sensor Node Common',
     author='UC San Diego Engineers for Exploration',
     author_email='e4e@eng.ucsd.edu',
     packages=find_packages(),

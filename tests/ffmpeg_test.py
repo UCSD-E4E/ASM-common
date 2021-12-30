@@ -29,7 +29,7 @@ def test_audioHWSource():
     assert(rx_ffmpeg.poll() is None)
     
     audio_source = audio.HWAudioSource('default', num_channels=num_channels)
-    audio_sink = rtp.RTPStream('127.0.0.1', port)
+    audio_sink = rtp.RTPAudioStream('127.0.0.1', port)
     audio_sink.configure_audio(codec='libmp3lame', rate=sample_rate)
     ffmpeg_config = ffmpeg.FFMPEGInstance(
         input_obj=audio_source, output_obj=audio_sink)
@@ -60,7 +60,7 @@ def test_audioServer():
         test_file_path.unlink()
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    stream_source = rtp.RTPStream(ip_addr, port)
+    stream_source = rtp.RTPAudioStream(ip_addr, port)
     stream_sink = AudioFileSink(path=test_file_path)
     server_config = ffmpeg.FFMPEGInstance(input_obj=stream_source, output_obj=stream_sink)
      
@@ -69,7 +69,7 @@ def test_audioServer():
     assert(rx_ffmpeg.poll() is None)
     
     audio_source = audio.HWAudioSource('default', num_channels=num_channels)
-    audio_sink = rtp.RTPStream(ip_addr, port)
+    audio_sink = rtp.RTPAudioStream(ip_addr, port)
     audio_sink.configure_audio(codec='libmp3lame', rate=sample_rate)
     client_config = ffmpeg.FFMPEGInstance(
         input_obj=audio_source, output_obj=audio_sink)
