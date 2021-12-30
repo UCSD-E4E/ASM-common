@@ -11,5 +11,11 @@ setup(
     packages=find_packages(),
     scripts=[],
     install_requires=[
-    ]
+    ],
+    extras_require={
+        'test':[
+            'pytest',
+            'coverage'
+        ]
+    }
 )

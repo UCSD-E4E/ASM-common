@@ -21,14 +21,16 @@ class HWAudioSource(MediaInput, AudioStream):
                         bitrate:int = None,
                         num_channels:int = None,
                         ) -> None:
-        if rate:
-            self.__sample_rate = rate
-        if codec:
-            self.__codec = codec
-        if bitrate:
-            self.__bitrate = bitrate
-        if num_channels:
-            self.__num_channels = num_channels
+        pass
+        # TODO the following does not currently work - should it?
+        # if rate:
+        #     self.__sample_rate = rate
+        # if codec:
+        #     self.__codec = codec
+        # if bitrate:
+        #     self.__bitrate = bitrate
+        # if num_channels:
+        #     self.__num_channels = num_channels
 
     @staticmethod
     def get_input_devices() -> Dict[str, str]:
@@ -43,10 +45,8 @@ class HWAudioSource(MediaInput, AudioStream):
         opts = ['-f', 'alsa', 
                 '-channels', f'{self.__num_channels}',
                 '-sample_rate', f'{self.__sample_rate}']
-        if self.__codec:
-            opts.extend(['-codec:a', self.__codec])
+        # if self.__codec:
+        #     opts.extend(['-codec:a', self.__codec])
         opts.extend(['-i', self.__id])
         return opts
 
-if __name__ == '__main__':
-    print(HWAudioSource.get_input_devices())
