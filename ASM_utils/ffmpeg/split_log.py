@@ -24,6 +24,7 @@ def process_output():
         if b_in == b'\n' or b_in == b'\r':
             out_file = stats_file if line.decode().startswith('frame') else info_file
             out_file.write(line)
+            out_file.flush()
             line = bytearray()
 
     stats_file.close()
