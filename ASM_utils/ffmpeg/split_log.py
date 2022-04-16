@@ -11,24 +11,25 @@ def process_output():
     parser.add_argument('output_info_file', help='file path for info file')
     args = parser.parse_args()
 
-    pathlib.Path(os.path.dirname(args.output_stats_file)).mkdir(parents=True, exist_ok=True)
-    pathlib.Path(os.path.dirname(args.output_info_file)).mkdir(parents=True, exist_ok=True)
+    stats_dir = os.path.dirname(args.output_stats_file)
+    info_dir = os.path.dirname(args.output_info_file)
+    pathlib.Path(stats_dir).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(info_dir).mkdir(parents=True, exist_ok=True)
 
     stats_file = open(args.output_stats_file, 'ab+')
     info_file = open(args.output_info_file, 'ab+')
 
     line = bytearray()
     while True:
+        # read1 to prevent excess read calls/blocking
         b_in = sys.stdin.buffer.read1(1)
         line.extend(b_in)
         if b_in == b'\n' or b_in == b'\r':
-            out_file = stats_file if line.decode().startswith('frame') else info_file
+            is_frame = line.decode().startswith('frame')
+            out_file = stats_file if is_frame else info_file
             out_file.write(line)
             out_file.flush()
             line = bytearray()
-
-    stats_file.close()
-    info_file.close()
 
 if __name__ == "__main__":
     process_output()
