@@ -1,9 +1,10 @@
 # usage: split_log [output_stats_file] [output_info_file]
 
-import sys
+import argparse
 import os
 import pathlib
-import argparse
+import sys
+
 
 def process_output():
     parser = argparse.ArgumentParser(description='Split ffmpeg log files.')
