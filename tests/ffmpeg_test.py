@@ -1,15 +1,42 @@
 import datetime as dt
-import glob
 import json
-import os
 import pathlib
+import shlex
 import subprocess
+import sys
 
 import ASM_utils.ffmpeg.audio as audio
 import ASM_utils.ffmpeg.ffmpeg as ffmpeg
 import ASM_utils.ffmpeg.rtp as rtp
-import ASM_utils.ffmpeg.video as video
-from ASM_utils.ffmpeg.file import AudioFileSink, SegmentedAudioFileSink
+from ASM_utils.ffmpeg.file import (AudioFileSink, SegmentedAudioFileSink,
+                                   SegmentedVideoFileSink)
+
+
+def test_videoRTSPSink():
+    folder = pathlib.Path("/", "tmp", "videoRTSPSink")
+    folder.mkdir(parents=True, exist_ok=True)
+    cmd = (f'/usr/bin/ffmpeg -i rtsp://rtsp.stream/pattern -c copy -flags +global_header'
+            f' -f segment -segment_time 500 -strftime 1 -t 12 '
+            f'-reset_timestamps 1 {folder.joinpath("%Y.%m.%d.%H.%M.%S.mp4").as_posix()} '
+        )
+    cmd2 = f'{sys.executable} -m ASM_utils.ffmpeg.split_log {folder.joinpath("stats.log").as_posix()} {folder.joinpath("info.log").as_posix()}'
+    
+    ffmpeg_p = subprocess.Popen(shlex.split(cmd), stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    logger_p = subprocess.Popen(shlex.split(cmd2), stdin=ffmpeg_p.stdout, stdout=None)
+    logger_p.wait(timeout=15)
+
+def test_videoRTSPSinkFastFail():
+    folder = pathlib.Path("/", "tmp", "videoRTSPSink")
+    folder.mkdir(parents=True, exist_ok=True)
+    cmd = (f'/usr/bin/ffmpeg -i rtsp://rtsp.stream/pattern1 -c copy -flags +global_header'
+            f' -f segment -segment_time 500 -strftime 1 -t 12 '
+            f'-reset_timestamps 1 {folder.joinpath("%Y.%m.%d.%H.%M.%S.mp4").as_posix()} '
+        )
+    cmd2 = f'{sys.executable} -m ASM_utils.ffmpeg.split_log {folder.joinpath("stats.log").as_posix()} {folder.joinpath("info.log").as_posix()}'
+    
+    ffmpeg_p = subprocess.Popen(shlex.split(cmd), stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    logger_p = subprocess.Popen(shlex.split(cmd2), stdin=ffmpeg_p.stdout, stdout=None)
+    logger_p.wait(timeout=1)
 
 
 def test_audioHWSource():

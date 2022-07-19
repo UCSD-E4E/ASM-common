@@ -24,6 +24,8 @@ def process_output():
     while True:
         # read1 to prevent excess read calls/blocking
         b_in = sys.stdin.buffer.read1(1)
+        if b_in == b'':
+            break
         line.extend(b_in)
         if b_in == b'\n' or b_in == b'\r':
             is_frame = line.decode().startswith('frame')

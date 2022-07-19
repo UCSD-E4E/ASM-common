@@ -4,7 +4,7 @@ from ASM_utils.ffmpeg.ffmpeg import AudioStream, MediaInput, MediaOutput, VideoS
 
 
 class RTPBaseStream(MediaOutput, MediaInput):
-    def __init__(self, hostname:str, port:Optional[int] = None, protocol:str = 'tcp', format:str = 'mpegts'):
+    def __init__(self, hostname:str, port:Optional[int] = 554, protocol:str = 'tcp', format:str = 'mpegts'):
         super().__init__()
         self.__protocol = protocol
         self.__hostname = hostname
