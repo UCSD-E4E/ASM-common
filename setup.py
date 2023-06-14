@@ -11,13 +11,14 @@ setup(
     packages=find_packages(),
     scripts=[],
     install_requires=[
-        "pytest",
-        'coverage',
+        'tzlocal'
     ],
     extras_require={
-        'test':[
+        'dev':[
             'pytest',
-            'coverage'
+            'coverage',
+            'pylint',
+            'wheel',
         ]
     }
 )
