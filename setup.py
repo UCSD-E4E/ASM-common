@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
-import os
+'''ASM Common Utilities setup
+'''
+from setuptools import find_packages, setup
+
 import ASM_utils
 
 setup(
