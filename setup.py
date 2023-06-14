@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
-import os
+'''ASM Common Utilities setup
+'''
+from setuptools import find_packages, setup
+
 import ASM_utils
 
 setup(
@@ -11,13 +13,14 @@ setup(
     packages=find_packages(),
     scripts=[],
     install_requires=[
-        "pytest",
-        'coverage',
+        'tzlocal'
     ],
     extras_require={
-        'test':[
+        'dev':[
             'pytest',
-            'coverage'
+            'coverage',
+            'pylint',
+            'wheel',
         ]
     }
 )
